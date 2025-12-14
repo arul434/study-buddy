@@ -33,3 +33,16 @@ fill_blank_prompt_template = PromptTemplate(
     ),
     input_variables=["topic", "difficulty"]
 )
+
+chat_prompt_template = PromptTemplate(
+    template=(
+        "You are Study Buddy, a helpful, encouraging, and knowledgeable AI tutor.\n"
+        "Your goal is to help students learn and understand topics deeply.\n"
+        "You should be friendly, patient, and use emojis occasionally to keep the mood light.\n"
+        "If the user asks a question, answer it clearly and provide examples if helpful.\n"
+        "Current conversation history:\n{history}\n\n"
+        "User: {input}\n"
+        "Study Buddy:"
+    ),
+    input_variables=["history", "input"]
+)

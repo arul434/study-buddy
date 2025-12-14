@@ -22,7 +22,11 @@ def main():
         st.session_state.rerun_trigger = False
         
 
-    st.title("Study Buddy AI NEW NEW NEW NEW")
+    st.title("Study Buddy AI")
+    
+    tab1, tab2 = st.tabs(["Quiz Generator", "Chat Assistant"])
+    
+    with tab1:
 
     st.sidebar.header("Quiz Settings")
 
@@ -117,6 +121,40 @@ def main():
                         )
                 else:
                     st.warning("No results avialble")
+
+    with tab2:
+        st.header("Chat with Study Buddy")
+        
+        # Initialize chat history
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
+
+        # Display chat messages from history on app rerun
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+
+        # Accept user input
+        if prompt := st.chat_input("Ask me anything related to your studies..."):
+            # Add user message to chat history
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            # Display user message in chat message container
+            with st.chat_message("user"):
+                st.markdown(prompt)
+
+            # Display assistant response in chat message container
+            with st.chat_message("assistant"):
+                from src.chat.chat_manager import ChatManager
+                
+                # Format history for prompt
+                history_str = "\n".join([f"{m['role'].capitalize()}: {m['content']}" for m in st.session_state.messages[:-1]])
+                
+                chat_manager = ChatManager(model_name=model_name)
+                response = chat_manager.get_response(prompt, history_str)
+                st.markdown(response)
+                
+            # Add assistant response to chat history
+            st.session_state.messages.append({"role": "assistant", "content": response})
 
 if __name__=="__main__":
     main()
