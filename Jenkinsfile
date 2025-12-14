@@ -76,7 +76,12 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'argo', usernameVariable: 'ARGOCD_USER', passwordVariable: 'ARGOCD_PASS')]) {
                         sh '''
                         argocd login argocd.aruljr.dev --username $ARGOCD_USER --password "$ARGOCD_PASS" --insecure --grpc-web
-                        argocd app sync study
+                        
+                        echo "Verifying logged in user..."
+                        argocd account get-user-info --insecure --grpc-web
+                        
+                        echo "Syncing app..."
+                        argocd app sync study --insecure --grpc-web
                         '''
                     }
                 }
