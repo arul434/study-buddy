@@ -1,22 +1,24 @@
 pipeline {
     agent any
     environment {
-        DOCKER_HUB_REPO = "dataguru97/studybuddy"
-        DOCKER_HUB_CREDENTIALS_ID = "dockerhub-token"
+        REGISTRY = 'localhost:5000'
+        IMAGE_NAME = 'study-buddy'
         IMAGE_TAG = "v${BUILD_NUMBER}"
+        FULL_IMAGE = "${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+        NAMESPACE = 'default'
     }
     stages {
         stage('Checkout Github') {
             steps {
                 echo 'Checking out code from GitHub...'
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-token', url: 'https://github.com/data-guru0/STUDY-BUDDY-AI.git']])
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-token', url: 'https://github.com/arul434/study-buddy.git']])
             }
         }        
         stage('Build Docker Image') {
             steps {
                 script {
                     echo 'Building Docker image...'
-                    dockerImage = docker.build("${DOCKER_HUB_REPO}:${IMAGE_TAG}")
+                    dockerImage = docker.build("${FULL_IMAGE}")
                 }
             }
         }
@@ -24,9 +26,10 @@ pipeline {
             steps {
                 script {
                     echo 'Pushing Docker image to DockerHub...'
-                    docker.withRegistry('https://registry.hub.docker.com' , "${DOCKER_HUB_CREDENTIALS_ID}") {
-                        dockerImage.push("${IMAGE_TAG}")
-                    }
+                    // docker.withRegistry('http://registry.hub.docker.com' , "${DOCKER_HUB_CREDENTIALS_ID}") {
+                    //     dockerImage.push("${IMAGE_TAG}")
+                    // }
+                    docker push "${FULL_IMAGE}" 
                 }
             }
         }
@@ -34,7 +37,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    sed -i 's|image: dataguru97/studybuddy:.*|image: dataguru97/studybuddy:${IMAGE_TAG}|' manifests/deployment.yaml
+                    sed -i 's|image: study-buddy:.*|image: study-buddy:${IMAGE_TAG}|' manifests/deployment.yaml
                     """
                 }
             }
@@ -45,11 +48,11 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
                         sh '''
-                        git config user.name "data-guru0"
-                        git config user.email "gyrogodnon@gmail.com"
+                        git config user.name "arul434"
+                        git config user.email "arul.dsacoe@gmail.com"
                         git add manifests/deployment.yaml
                         git commit -m "Update image tag to ${IMAGE_TAG}" || echo "No changes to commit"
-                        git push https://${GIT_USER}:${GIT_PASS}@github.com/data-guru0/STUDY-BUDDY-AI.git HEAD:main
+                        git push https://${GIT_USER}:${GIT_PASS}@github.com/arul434/study-buddy.git HEAD:main
                         '''
                     }
                 }
@@ -72,7 +75,7 @@ pipeline {
                 script {
                     kubeconfig(credentialsId: 'kubeconfig', serverUrl: 'https://192.168.49.2:8443') {
                         sh '''
-                        argocd login 34.45.193.5:31704 --username admin --password $(kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d) --insecure
+                        argocd login https://argocd.aruljr.dev --username admin --password $(kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d) --insecure
                         argocd app sync study
                         '''
                     }
