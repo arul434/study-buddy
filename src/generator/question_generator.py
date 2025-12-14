@@ -8,8 +8,8 @@ from src.common.custom_exception import CustomException
 
 
 class QuestionGenerator:
-    def __init__(self):
-        self.llm = get_groq_llm()
+    def __init__(self, model_name=None):
+        self.llm = get_groq_llm(model_name)
         self.logger = get_logger(self.__class__.__name__)
 
     def _retry_and_parse(self,prompt,parser,topic,difficulty):

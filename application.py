@@ -26,6 +26,12 @@ def main():
 
     st.sidebar.header("Quiz Settings")
 
+    model_name = st.sidebar.selectbox(
+        "Select Model",
+        ["llama3-8b-8192", "llama3-70b-8192", "mixtral-8x7b-32768", "gemma-7b-it"],
+        index=0
+    )
+
     question_type = st.sidebar.selectbox(
         "Select Question Type" ,
         ["Multiple Choice" , "Fill in the Blank"],
@@ -51,7 +57,7 @@ def main():
     if st.sidebar.button("Generate Quiz"):
         st.session_state.quiz_submitted = False
 
-        generator = QuestionGenerator()
+        generator = QuestionGenerator(model_name=model_name)
         succces = st.session_state.quiz_manager.generate_questions(
             generator,
             topic,question_type,difficulty,num_questions
