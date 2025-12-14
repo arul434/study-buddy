@@ -82,10 +82,14 @@ pipeline {
                         # Login
                         argocd login $ARGOCD_SERVER --username $ARGOCD_USER --password "$ARGOCD_PASS"
                         
-                        echo "Verifying user and listing apps..."
-                        argocd account get-user-info
-                        argocd app list
-                        
+                        echo "Creating/Updating 'study' app..."
+                        argocd app create study \
+                            --repo https://github.com/arul434/study-buddy.git \
+                            --path manifests \
+                            --dest-server https://kubernetes.default.svc \
+                            --dest-namespace default \
+                            --upsert
+
                         echo "Syncing..."
                         argocd app sync study
                         '''
