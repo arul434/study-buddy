@@ -73,9 +73,9 @@ pipeline {
         stage('Apply Kubernetes & Sync App with ArgoCD') {
             steps {
                 script {
-                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                    withCredentials([usernamePassword(credentialsId: 'argo', usernameVariable: 'ARGOCD_USER', passwordVariable: 'ARGOCD_PASS')]) {
                         sh '''
-                        argocd login https://argocd.aruljr.dev --username admin --password $(kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d) --insecure
+                        argocd login argocd.aruljr.dev --username $ARGOCD_USER --password "$ARGOCD_PASS" --insecure --grpc-web
                         argocd app sync study
                         '''
                     }
