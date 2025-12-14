@@ -18,7 +18,7 @@ pipeline {
             steps {
                 script {
                     echo 'Building Docker image...'
-                    dockerImage = docker.build("${FULL_IMAGE}")
+                    sh "docker build -t ${FULL_IMAGE} ."
                 }
             }
         }
@@ -29,7 +29,7 @@ pipeline {
                     // docker.withRegistry('http://registry.hub.docker.com' , "${DOCKER_HUB_CREDENTIALS_ID}") {
                     //     dockerImage.push("${IMAGE_TAG}")
                     // }
-                    docker push "${FULL_IMAGE}" 
+                    sh "docker push ${FULL_IMAGE}" 
                 }
             }
         }
