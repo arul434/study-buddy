@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: llmops-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: study-buddy.aruljr.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: llmops-service
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - study-buddy.aruljr.dev
+      secretName: study-buddy-tls

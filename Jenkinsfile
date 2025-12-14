@@ -37,7 +37,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    sed -i 's|image: study-buddy:.*|image: study-buddy:${IMAGE_TAG}|' manifests/deployment.yaml
+                    sed -i "s|image: .*${IMAGE_NAME}:.*|image: ${FULL_IMAGE}|" manifests/deployment.yaml
                     """
                 }
             }

@@ -14,12 +14,12 @@ spec:
     spec:
       containers:
         - name: llmops-app
-          image: localhost:5000/study-buddy:v1
+          image: localhost:5000/study-buddy:v8
           ports:
             - containerPort: 8501
           env:
             - name: GROQ_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: groq-api-secret
+                  name: llmops-secrets
                   key: GROQ_API_KEY
