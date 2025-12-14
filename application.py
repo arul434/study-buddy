@@ -26,9 +26,17 @@ def main():
 
     st.sidebar.header("Quiz Settings")
 
+    from src.llm.groq_client import get_supported_models
+
+    @st.cache_data
+    def load_models():
+        return get_supported_models()
+
+    available_models = load_models()
+    
     model_name = st.sidebar.selectbox(
         "Select Model",
-        ["llama3-8b-8192", "llama3-70b-8192", "mixtral-8x7b-32768", "gemma-7b-it"],
+        available_models,
         index=0
     )
 
