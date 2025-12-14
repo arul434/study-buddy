@@ -77,11 +77,11 @@ pipeline {
                         sh '''
                         argocd login argocd.aruljr.dev --username $ARGOCD_USER --password "$ARGOCD_PASS" --insecure --grpc-web
                         
-                        echo "Verifying logged in user..."
-                        argocd account get-user-info --insecure --grpc-web
-                        
+                        echo "Checking app status..."
+                        argocd app get study --username $ARGOCD_USER --password "$ARGOCD_PASS" --insecure --grpc-web
+
                         echo "Syncing app..."
-                        argocd app sync study --insecure --grpc-web
+                        argocd app sync study --username $ARGOCD_USER --password "$ARGOCD_PASS" --insecure --grpc-web
                         '''
                     }
                 }
