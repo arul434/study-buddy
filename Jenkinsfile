@@ -75,13 +75,19 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'argo', usernameVariable: 'ARGOCD_USER', passwordVariable: 'ARGOCD_PASS')]) {
                         sh '''
-                        argocd login argocd.aruljr.dev --username $ARGOCD_USER --password "$ARGOCD_PASS" --insecure --grpc-web
+                        # Export env vars for consistency
+                        export ARGOCD_SERVER=argocd.aruljr.dev
+                        export ARGOCD_OPTS='--insecure --grpc-web'
                         
-                        echo "Checking app status..."
-                        argocd app get study --username $ARGOCD_USER --password "$ARGOCD_PASS" --insecure --grpc-web
-
-                        echo "Syncing app..."
-                        argocd app sync study --username $ARGOCD_USER --password "$ARGOCD_PASS" --insecure --grpc-web
+                        # Login
+                        argocd login $ARGOCD_SERVER --username $ARGOCD_USER --password "$ARGOCD_PASS"
+                        
+                        echo "Verifying user and listing apps..."
+                        argocd account get-user-info
+                        argocd app list
+                        
+                        echo "Syncing..."
+                        argocd app sync study
                         '''
                     }
                 }
